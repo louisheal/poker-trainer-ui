@@ -6,7 +6,7 @@ interface RangeProps {
     setSelected: (rangeId: number) => void;
 }
 
-function RangeSelector({ ranges, selected, setSelected }: RangeProps) {
+function RangeSelector({ ranges, setSelected }: RangeProps) {
     return (
         <div
             style={{

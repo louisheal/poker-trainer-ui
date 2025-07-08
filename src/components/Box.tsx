@@ -8,7 +8,7 @@ function Box({ data }: BoxProps) {
     let green = 255 * 2 * (data.correct / data.total);
     let red = 255 * 2 * (1 - data.correct / data.total);
 
-    let b = 255 - (green * red) / 2;
+    const b = 255 - (green * red) / 2;
 
     if (data.total == 0) {
         green = 0;
