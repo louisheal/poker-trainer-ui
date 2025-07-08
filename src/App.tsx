@@ -13,7 +13,7 @@ function App() {
     const [secondCard, setSecondCard] = useState<CardInfo>();
 
     const [board, setBoard] = useState<Array<Array<CellData>>>([]);
-    const [result, setResult] = useState<boolean>();
+    const [, setResult] = useState<boolean>();
 
     const [ranges, setRanges] = useState<Array<RangeInfo>>([]);
     const [rangeId, setRangeId] = useState<number>(0);
