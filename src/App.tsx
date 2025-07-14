@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import type { CardInfo, CellData, RangeInfo } from "./types";
-import { fetchBoard, fetchHand, fetchRanges, postAction } from "./api";
+import {
+    fetchBoard,
+    fetchHand,
+    fetchRanges,
+    postAction,
+    postReset,
+} from "./api";
 import Card from "./components/Card";
 import Actions from "./components/Actions";
 import Board from "./components/Board";
@@ -35,11 +41,11 @@ function App() {
         const loadRanges = async () => {
             const ranges = await fetchRanges();
             setRanges(ranges);
+            await loadHand(rangeId);
+            await loadBoard(rangeId);
         };
 
         loadRanges();
-        loadHand(rangeId);
-        loadBoard(rangeId);
     }, [rangeId]);
 
     if (!handId || !firstCard || !secondCard) {
@@ -50,8 +56,14 @@ function App() {
     const doAction = async (action: number) => {
         const result = await postAction(handId, action);
         setResult(result);
-        loadHand(rangeId);
-        loadBoard(rangeId);
+        await loadHand(rangeId);
+        await loadBoard(rangeId);
+    };
+
+    const reset = async () => {
+        await postReset(rangeId);
+        await loadHand(rangeId);
+        await loadBoard(rangeId);
     };
 
     return (
@@ -75,6 +87,7 @@ function App() {
                     <Actions
                         fold={() => doAction(0)}
                         raise={() => doAction(1)}
+                        reset={reset}
                     />
                 </div>
                 <Board board={board} />

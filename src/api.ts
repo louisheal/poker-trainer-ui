@@ -8,7 +8,7 @@ interface HandResponse {
     }
 }
 
-const url = "https://api.poker.louisheal.com"
+const url = "http://localhost:5272"
 
 export const fetchHand: (rangeId: number) => Promise<[string, CardInfo, CardInfo]> = async (rangeId: number) => {
     const response = await fetch(url + "/api/Poker/hand?rangeId=" + rangeId, {
@@ -31,6 +31,12 @@ export const postAction = async (id: string, action: number) => {
     });
     const { correct: result } = await response.json();
     return result;
+}
+
+export const postReset = async (rangeId: number) => {
+    await fetch(url + "/api/Poker/reset?rangeId=" + rangeId, {
+        method: "POST",
+    });
 }
 
 export const fetchBoard = async (rangeId: number) => {
