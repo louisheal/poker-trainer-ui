@@ -8,7 +8,7 @@ interface HandResponse {
     }
 }
 
-const url = "http://localhost:5272"
+const url = "https://api.poker.louisheal.com"
 
 export const fetchHand: (rangeId: number) => Promise<[string, CardInfo, CardInfo]> = async (rangeId: number) => {
     const response = await fetch(url + "/api/Poker/hand?rangeId=" + rangeId, {
