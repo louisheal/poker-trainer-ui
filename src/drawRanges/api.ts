@@ -14,10 +14,10 @@ import type {
 
 // TODO : remove before committing
 // TODO : find a way to easily switch between local dev and
-const URL = "http://localhost:5272";
+// const URL = "http://localhost:5272";
 
 export const getSpot = async (): Promise<RangeSpot> => {
-  const response = await fetch(`${URL}/api/DrawRanges/rangeSpot`);
+  const response = await fetch(`/api/DrawRanges/rangeSpot`);
 
   if (!response.ok) {
     throw new Error(`Response status: ${response.status}`);
