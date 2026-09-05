@@ -1,20 +1,18 @@
 import { Card } from "@/components/ui/card";
-import type { Action, RangeCell } from "@/drawRanges/model";
+import type { PokerAction, PokerRange } from "@/drawRanges/model";
 import { useRef } from "react";
 
 interface Props {
-  grid: RangeCell[][];
-  setGrid: (
-    prev: RangeCell[][] | ((prev: RangeCell[][]) => RangeCell[][]),
-  ) => void;
+  grid: PokerRange;
+  setGrid: (prev: PokerRange | ((prev: PokerRange) => PokerRange)) => void;
   size?: "default" | "small";
 }
 
 export const RangeGrid = (props: Props) => {
   const pointerDownRef = useRef(false);
-  const targetActionRef = useRef<Action>("Raise");
+  const targetActionRef = useRef<PokerAction>("Raise");
 
-  const onPointerDown = (current: Action, row: number, col: number) => {
+  const onPointerDown = (current: PokerAction, row: number, col: number) => {
     const targetAction = current === "Fold" ? "Raise" : "Fold";
     targetActionRef.current = targetAction;
     pointerDownRef.current = true;
@@ -77,13 +75,13 @@ const getRounding = (row: number, col: number) => {
 };
 
 interface GridCellProps {
-  action: Action;
+  action: PokerAction;
   handKey: string;
   row: number;
   col: number;
   size?: "default" | "small";
   onPointerEnter: (row: number, col: number) => void;
-  onPointerDown: (current: Action, row: number, col: number) => void;
+  onPointerDown: (current: PokerAction, row: number, col: number) => void;
 }
 
 const GridCell = (props: GridCellProps) => {

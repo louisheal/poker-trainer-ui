@@ -1,4 +1,6 @@
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { PokerAction } from "@/drawRanges/model";
 
 interface Action {
   Position: string;
@@ -6,19 +8,31 @@ interface Action {
 }
 
 interface Props {
-  action: Action;
-  highlight?: boolean;
+  sequenceAction: Action;
+  onUpdate: (action: PokerAction) => void;
 }
+
+// TODO : store this somewhere easy to find and edit
+const Actions: PokerAction[] = ["Raise", "Fold"];
 
 export const ActionPanel = (props: Props) => {
   return (
     <Card className="w-25">
       <CardHeader>
-        <CardTitle>{props.action.Position}</CardTitle>
+        <CardTitle>{props.sequenceAction.Position}</CardTitle>
       </CardHeader>
-      <CardContent>
-        <p>{props.action.Action}</p>
-      </CardContent>
+      {Actions.map((action) => (
+        <CardContent>
+          <Button
+            variant={
+              props.sequenceAction.Action === action ? "outline" : "default"
+            }
+            onClick={() => props.onUpdate(action)}
+          >
+            {action}
+          </Button>
+        </CardContent>
+      ))}
     </Card>
   );
 };

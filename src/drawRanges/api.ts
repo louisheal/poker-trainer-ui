@@ -1,41 +1,65 @@
-import type {
-  ActionDto,
-  ActionSpotDto,
-  PositionDto,
-  RangeSpotDto,
-} from "@/drawRanges/dto";
-import type {
-  Action,
-  Position,
-  RangeCell,
-  RangeSpot,
-  SequenceAction,
-} from "@/drawRanges/model";
+import type { ActionDto, PokerRangeDto } from "@/drawRanges/dto";
+import type { PokerAction, PokerRange, RangeCell } from "@/drawRanges/model";
 
-// TODO : remove before committing
-// TODO : find a way to easily switch between local dev and
-// const URL = "http://localhost:5272";
+const URL = import.meta.env.VITE_API_URL ?? "";
 
-export const getSpot = async (): Promise<RangeSpot> => {
-  const response = await fetch(`/api/DrawRanges/rangeSpot`);
+export const getRange = async (spotKey: string): Promise<PokerRange> => {
+  const response = await fetch(
+    `${URL}/api/DrawRanges/range?spotKey=${spotKey}`,
+  );
 
   if (!response.ok) {
     throw new Error(`Response status: ${response.status}`);
   }
 
-  const rangeSpotDto = await response.json();
-  return mapRangeSpot(rangeSpotDto);
+  const range: PokerRangeDto = await response.json();
+  return mapRange(range);
 };
 
-const mapRangeSpot = (rangeSpotDto: RangeSpotDto): RangeSpot => ({
-  Sequence: rangeSpotDto.sequence.map(mapSequenceAction),
-  Range: mapRange(rangeSpotDto.range),
-});
+export const updateRange = async (
+  spotKey: string,
+  update: PokerRange,
+): Promise<PokerRange> => {
+  const newRange: Record<string, string> = Object.fromEntries(
+    update.flatMap((row) =>
+      row.map((hand) => [hand.HandKey, hand.Action.toLowerCase()]),
+    ),
+  );
 
-const mapSequenceAction = (actionDto: ActionSpotDto): SequenceAction => ({
-  Position: mapPosition(actionDto.position),
-  Action: mapAction(actionDto.action),
-});
+  const response = await fetch(
+    `${URL}/api/DrawRanges/range?spotKey=${spotKey}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newRange),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Response status: ${response.status}`);
+  }
+
+  const range: PokerRangeDto = await response.json();
+  return mapRange(range);
+};
+
+const mapRange = (rangeDto: Record<string, ActionDto>): RangeCell[][] => {
+  const handKeys = generateHandKeys();
+  return handKeys.map((row) =>
+    row.map((key) => ({ HandKey: key, Action: mapAction(rangeDto[key]) })),
+  );
+};
+
+const mapAction = (actionDto: ActionDto): PokerAction => {
+  switch (actionDto) {
+    case "fold":
+      return "Fold";
+    case "raise":
+      return "Raise";
+  }
+};
 
 const cards = ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"];
 
@@ -61,37 +85,4 @@ const generateHandKeys = () => {
     result.push(row);
   }
   return result;
-};
-
-const mapRange = (rangeDto: Record<string, ActionDto>): RangeCell[][] => {
-  const handKeys = generateHandKeys();
-  return handKeys.map((row) =>
-    row.map((key) => ({ HandKey: key, Action: mapAction(rangeDto[key]) })),
-  );
-};
-
-const mapPosition = (positionDto: PositionDto): Position => {
-  switch (positionDto) {
-    case "lj":
-      return "Lojack";
-    case "hj":
-      return "Hijack";
-    case "co":
-      return "Cutoff";
-    case "btn":
-      return "Button";
-    case "sb":
-      return "Small Blind";
-    case "bb":
-      return "Big Blind";
-  }
-};
-
-const mapAction = (actionDto: ActionDto): Action => {
-  switch (actionDto) {
-    case "fold":
-      return "Fold";
-    case "raise":
-      return "Raise";
-  }
 };
