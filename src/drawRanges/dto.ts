@@ -11,3 +11,5 @@ export interface RangeSpotDto {
   sequence: ActionSpotDto[];
   range: Record<string, ActionDto>;
 }
+
+export type PokerRangeDto = Record<string, ActionDto>;
