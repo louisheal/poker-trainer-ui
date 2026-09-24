@@ -1,3 +1,4 @@
+import { useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Sidebar,
   SidebarContent,
@@ -13,6 +14,9 @@ import {
 import { Grid2X2Check } from "lucide-react";
 
 export const AppSidebar = () => {
+  const navigate = useNavigate();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
@@ -21,7 +25,10 @@ export const AppSidebar = () => {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton isActive>
+                <SidebarMenuButton
+                  isActive={pathname === "/ranges" || pathname === "/"}
+                  onClick={() => navigate({ to: "/ranges" })}
+                >
                   <Grid2X2Check />
                   <span>Draw Ranges</span>
                 </SidebarMenuButton>

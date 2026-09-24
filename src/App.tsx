@@ -1,15 +1,17 @@
 import { AppSidebar } from "@/AppSidebar";
 import { ThemeProvider } from "@/theme/ThemeProvider";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { DrawRanges } from "@/drawRanges/DrawRanges";
+import { Outlet } from "@tanstack/react-router";
 
-export const App = () => (
-  <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-    <SidebarProvider className="h-svh">
-      <AppSidebar />
-      <main className="w-full">
-        <DrawRanges />
-      </main>
-    </SidebarProvider>
-  </ThemeProvider>
-);
+export const App = () => {
+  return (
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <SidebarProvider className="h-svh">
+        <AppSidebar />
+        <main className="w-full">
+          <Outlet />
+        </main>
+      </SidebarProvider>
+    </ThemeProvider>
+  );
+};
