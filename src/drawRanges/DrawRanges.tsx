@@ -99,7 +99,7 @@ export const DrawRanges = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center gap-3 p-3 sm:gap-4 sm:p-4 md:p-8">
+    <div className="flex w-full flex-col items-center justify-center gap-3 px-0 py-3 sm:gap-4 sm:px-4 sm:py-4 md:px-8 md:py-8">
       <ActionSequence sequence={sequence} />
       {submitted ? (
         <>

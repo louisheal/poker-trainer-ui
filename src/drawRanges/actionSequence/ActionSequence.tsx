@@ -25,23 +25,25 @@ export const ActionSequence = ({ sequence, onUpdate = () => {} }: Props) => {
   const nextPosition = PokerPositions[sequence.length];
 
   return (
-    <div className="flex gap-3 items-center">
-      {sequence.map((sequenceAction) => (
-        <>
-          <ActionPanel
-            sequenceAction={sequenceAction}
-            onUpdate={(action: PokerAction) =>
-              onUpdate(sequenceAction.Position, action)
-            }
-          />
-          <ChevronRight />
-        </>
-      ))}
-      {/* TODO : work out what the next position to act is */}
-      <ActionPanel
-        sequenceAction={{ Position: nextPosition, Action: "?" }}
-        onUpdate={(action) => onUpdate(nextPosition, action)}
-      />
+    <div className="w-full overflow-x-auto">
+      <div className="flex w-fit min-w-full items-center gap-2 pb-1 sm:gap-3">
+        {sequence.map((sequenceAction) => (
+          <div className="flex items-center gap-2 sm:gap-3" key={sequenceAction.Position}>
+            <ActionPanel
+              sequenceAction={sequenceAction}
+              onUpdate={(action: PokerAction) =>
+                onUpdate(sequenceAction.Position, action)
+              }
+            />
+            <ChevronRight className="shrink-0" />
+          </div>
+        ))}
+        {/* TODO : work out what the next position to act is */}
+        <ActionPanel
+          sequenceAction={{ Position: nextPosition, Action: "?" }}
+          onUpdate={(action) => onUpdate(nextPosition, action)}
+        />
+      </div>
     </div>
   );
 };

@@ -17,17 +17,18 @@ const Actions: PokerAction[] = ["Raise", "Fold"];
 
 export const ActionPanel = (props: Props) => {
   return (
-    <Card className="w-25">
+    <Card className="w-20 sm:w-24 md:w-25">
       <CardHeader>
-        <CardTitle>{props.sequenceAction.Position}</CardTitle>
+        <CardTitle className="text-xs sm:text-sm">{props.sequenceAction.Position}</CardTitle>
       </CardHeader>
       {Actions.map((action) => (
-        <CardContent>
+        <CardContent key={action}>
           <Button
             variant={
               props.sequenceAction.Action === action ? "outline" : "default"
             }
             onClick={() => props.onUpdate(action)}
+            className="w-full text-xs sm:text-sm"
           >
             {action}
           </Button>
