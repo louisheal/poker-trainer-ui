@@ -5,11 +5,13 @@ import type { PointerEvent } from "react";
 
 interface Props {
   grid: PokerRange;
-  setGrid: (prev: PokerRange | ((prev: PokerRange) => PokerRange)) => void;
+  setGrid?: (prev: PokerRange | ((prev: PokerRange) => PokerRange)) => void;
+  drawable?: boolean;
   size?: "default" | "small";
 }
 
 export const RangeGrid = (props: Props) => {
+  const isDrawable = props.drawable === true;
   const pointerDownRef = useRef(false);
   const activePointerIdRef = useRef<number | null>(null);
   const targetActionRef = useRef<PokerAction>("Raise");
@@ -20,13 +22,17 @@ export const RangeGrid = (props: Props) => {
   };
 
   useEffect(() => {
+    if (!isDrawable) {
+      return;
+    }
+
     window.addEventListener("pointerup", clearPointerState);
     window.addEventListener("pointercancel", clearPointerState);
     return () => {
       window.removeEventListener("pointerup", clearPointerState);
       window.removeEventListener("pointercancel", clearPointerState);
     };
-  }, []);
+  }, [isDrawable]);
 
   const onPointerDown = (
     event: PointerEvent<HTMLDivElement>,
@@ -34,6 +40,10 @@ export const RangeGrid = (props: Props) => {
     row: number,
     col: number,
   ) => {
+    if (!isDrawable) {
+      return;
+    }
+
     const targetAction = current === "Fold" ? "Raise" : "Fold";
     targetActionRef.current = targetAction;
     pointerDownRef.current = true;
@@ -44,13 +54,17 @@ export const RangeGrid = (props: Props) => {
   };
 
   const onEnterCell = (row: number, col: number) => {
-    if (pointerDownRef.current === false) {
+    if (!isDrawable || pointerDownRef.current === false) {
       return;
     }
     toggleCell(row, col);
   };
 
   const onPointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    if (!isDrawable) {
+      return;
+    }
+
     if (
       pointerDownRef.current === false ||
       activePointerIdRef.current !== event.pointerId
@@ -77,12 +91,20 @@ export const RangeGrid = (props: Props) => {
   };
 
   const onPointerUp = (event: PointerEvent<HTMLDivElement>) => {
+    if (!isDrawable) {
+      return;
+    }
+
     if (activePointerIdRef.current === event.pointerId) {
       clearPointerState();
     }
   };
 
   const toggleCell = (row: number, col: number) => {
+    if (!isDrawable || !props.setGrid) {
+      return;
+    }
+
     props.setGrid((prev) => {
       const next = [...prev];
       next[row] = [...next[row]];
@@ -97,10 +119,10 @@ export const RangeGrid = (props: Props) => {
   return (
     <div className={`w-full ${gridWidth}`}>
       <div
-        className="flex w-full touch-none select-none flex-col rounded-2xl"
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
+        className={`flex w-full flex-col rounded-2xl ${isDrawable ? "touch-none select-none" : "touch-auto"}`}
+        onPointerMove={isDrawable ? onPointerMove : undefined}
+        onPointerUp={isDrawable ? onPointerUp : undefined}
+        onPointerCancel={isDrawable ? onPointerUp : undefined}
       >
         {props.grid.map((row, i) => (
           <div className="flex w-full" key={`row-${i}`}>
@@ -113,6 +135,7 @@ export const RangeGrid = (props: Props) => {
                 col={j}
                 onPointerEnter={onEnterCell}
                 onPointerDown={onPointerDown}
+                drawable={isDrawable}
                 size={props.size}
               />
             ))}
@@ -152,12 +175,17 @@ interface GridCellProps {
     row: number,
     col: number,
   ) => void;
+  drawable: boolean;
 }
 
 const GridCell = (props: GridCellProps) => {
   const colour = props.action === "Fold" ? "bg-blue-400" : "bg-red-500";
   const hoverColour =
-    props.action === "Fold" ? "hover:bg-blue-300" : "hover:bg-red-400";
+    props.drawable
+      ? props.action === "Fold"
+        ? "hover:bg-blue-300"
+        : "hover:bg-red-400"
+      : "";
   const rounding = getRounding(props.row, props.col);
 
   const dimensions =
@@ -170,10 +198,14 @@ const GridCell = (props: GridCellProps) => {
       data-grid-cell="true"
       data-row={props.row}
       data-col={props.col}
-      className={`${colour} rounded-none ${rounding} ${dimensions} ${hoverColour} touch-none select-none items-center justify-center p-0 text-center leading-none`}
-      onPointerEnter={() => props.onPointerEnter(props.row, props.col)}
-      onPointerDown={(event) =>
-        props.onPointerDown(event, props.action, props.row, props.col)
+      className={`${colour} rounded-none ${rounding} ${dimensions} ${hoverColour} ${props.drawable ? "touch-none select-none" : "touch-auto"} items-center justify-center p-0 text-center leading-none`}
+      onPointerEnter={
+        props.drawable ? () => props.onPointerEnter(props.row, props.col) : undefined
+      }
+      onPointerDown={
+        props.drawable
+          ? (event) => props.onPointerDown(event, props.action, props.row, props.col)
+          : undefined
       }
       onDragStart={(e) => e.preventDefault()}
     >
