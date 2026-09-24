@@ -99,11 +99,11 @@ export const DrawRanges = () => {
   }
 
   return (
-    <div className="flex flex-col justify-center items-center gap-4 p-8">
+    <div className="flex flex-col items-center justify-center gap-3 p-3 sm:gap-4 sm:p-4 md:p-8">
       <ActionSequence sequence={sequence} />
       {submitted ? (
         <>
-          <div className="flex gap-4">
+          <div className="flex w-full flex-col items-center gap-3 sm:gap-4 lg:flex-row lg:justify-center">
             <RangeGrid grid={grid} setGrid={() => {}} size="small" />
             <RangeGrid grid={range} setGrid={() => {}} size="small" />
           </div>
