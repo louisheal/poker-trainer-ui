@@ -1,4 +1,4 @@
-import type { View } from "@/App";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Sidebar,
   SidebarContent,
@@ -13,12 +13,10 @@ import {
 } from "@/components/ui/sidebar";
 import { Dices, Grid2X2Check } from "lucide-react";
 
-interface Props {
-  view: string;
-  setView: (view: View) => void;
-}
+export const AppSidebar = () => {
+  const navigate = useNavigate();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
 
-export const AppSidebar = (props: Props) => {
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
@@ -28,8 +26,8 @@ export const AppSidebar = (props: Props) => {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  isActive={props.view === "ranges"}
-                  onClick={() => props.setView("ranges")}
+                  isActive={pathname === "/ranges" || pathname === "/"}
+                  onClick={() => navigate({ to: "/ranges" })}
                 >
                   <Grid2X2Check />
                   <span>Draw Ranges</span>
@@ -37,8 +35,8 @@ export const AppSidebar = (props: Props) => {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  isActive={props.view === "preflop"}
-                  onClick={() => props.setView("preflop")}
+                  isActive={pathname === "/preflop"}
+                  onClick={() => navigate({ to: "/preflop" })}
                 >
                   <Dices />
                   <span>Preflop Trainer</span>
