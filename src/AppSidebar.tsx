@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useMatchRoute } from "@tanstack/react-router";
 import {
   Sidebar,
   SidebarContent,
@@ -14,7 +14,9 @@ import {
 import { Dices, Grid2X2Check } from "lucide-react";
 
 export const AppSidebar = () => {
-  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const matchRoute = useMatchRoute();
+  const isRangesActive = Boolean(matchRoute({ to: "/ranges", fuzzy: true }));
+  const isPreflopActive = Boolean(matchRoute({ to: "/preflop", fuzzy: true }));
 
   return (
     <Sidebar collapsible="icon">
@@ -26,7 +28,7 @@ export const AppSidebar = () => {
               <SidebarMenuItem>
                 <SidebarMenuButton
                   render={<Link to="/ranges" />}
-                  isActive={pathname === "/ranges"}
+                  isActive={isRangesActive}
                 >
                   <Grid2X2Check />
                   <span>Draw Ranges</span>
@@ -35,7 +37,7 @@ export const AppSidebar = () => {
               <SidebarMenuItem>
                 <SidebarMenuButton
                   render={<Link to="/preflop" />}
-                  isActive={pathname === "/preflop"}
+                  isActive={isPreflopActive}
                 >
                   <Dices />
                   <span>Preflop Trainer</span>
