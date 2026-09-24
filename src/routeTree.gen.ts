@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as PreflopRouteImport } from './routes/preflop'
+import { Route as RangesRouteImport } from './routes/ranges'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +24,49 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PreflopRoute = PreflopRouteImport.update({
+  id: '/preflop',
+  path: '/preflop',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RangesRoute = RangesRouteImport.update({
+  id: '/ranges',
+  path: '/ranges',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/preflop': typeof PreflopRoute
+  '/ranges': typeof RangesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/preflop': typeof PreflopRoute
+  '/ranges': typeof RangesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/preflop': typeof PreflopRoute
+  '/ranges': typeof RangesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin'
+  fullPaths: '/' | '/admin' | '/preflop' | '/ranges'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin'
-  id: '__root__' | '/' | '/admin'
+  to: '/' | '/admin' | '/preflop' | '/ranges'
+  id: '__root__' | '/' | '/admin' | '/preflop' | '/ranges'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  PreflopRoute: typeof PreflopRoute
+  RangesRoute: typeof RangesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +85,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/preflop': {
+      id: '/preflop'
+      path: '/preflop'
+      fullPath: '/preflop'
+      preLoaderRoute: typeof PreflopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ranges': {
+      id: '/ranges'
+      path: '/ranges'
+      fullPath: '/ranges'
+      preLoaderRoute: typeof RangesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  PreflopRoute: PreflopRoute,
+  RangesRoute: RangesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
