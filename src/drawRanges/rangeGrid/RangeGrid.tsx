@@ -91,30 +91,33 @@ export const RangeGrid = (props: Props) => {
     });
   };
 
+  const gridWidth =
+    props.size === "small" ? "max-w-[30rem] lg:max-w-[28rem]" : "max-w-[42rem]";
+
   return (
-    <div className="w-full max-w-full overflow-x-auto pb-1">
+    <div className={`w-full ${gridWidth}`}>
       <div
-        className="inline-flex touch-none select-none flex-col rounded-2xl"
+        className="flex w-full touch-none select-none flex-col rounded-2xl"
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
       >
-      {props.grid.map((row, i) => (
-        <div className="flex" key={`row-${i}`}>
-          {row.map((rangeCell, j) => (
-            <GridCell
-              key={rangeCell.HandKey}
-              action={rangeCell.Action}
-              handKey={rangeCell.HandKey}
-              row={i}
-              col={j}
-              onPointerEnter={onEnterCell}
-              onPointerDown={onPointerDown}
-              size={props.size}
-            />
-          ))}
-        </div>
-      ))}
+        {props.grid.map((row, i) => (
+          <div className="flex w-full" key={`row-${i}`}>
+            {row.map((rangeCell, j) => (
+              <GridCell
+                key={rangeCell.HandKey}
+                action={rangeCell.Action}
+                handKey={rangeCell.HandKey}
+                row={i}
+                col={j}
+                onPointerEnter={onEnterCell}
+                onPointerDown={onPointerDown}
+                size={props.size}
+              />
+            ))}
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -159,8 +162,8 @@ const GridCell = (props: GridCellProps) => {
 
   const dimensions =
     props.size === "small"
-      ? "h-6 w-6 text-[9px] sm:h-7 sm:w-7 sm:text-[10px] md:h-9 md:w-9 md:text-xs"
-      : "h-8 w-8 text-[10px] sm:h-10 sm:w-10 sm:text-xs md:h-13 md:w-13 md:text-sm";
+      ? "w-[calc(100%/13)] aspect-square text-[clamp(8px,1.8vw,11px)]"
+      : "w-[calc(100%/13)] aspect-square text-[clamp(9px,2.2vw,14px)]";
 
   return (
     <Card
