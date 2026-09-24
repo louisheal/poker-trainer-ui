@@ -104,8 +104,8 @@ export const DrawRanges = () => {
       {submitted ? (
         <>
           <div className="flex w-full flex-col items-center gap-3 sm:gap-4 lg:flex-row lg:justify-center">
-            <RangeGrid grid={grid} setGrid={() => {}} size="small" />
-            <RangeGrid grid={range} setGrid={() => {}} size="small" />
+            <RangeGrid grid={grid} size="small" />
+            <RangeGrid grid={range} size="small" />
           </div>
           <Button onClick={onNext} variant="outline">
             Next
@@ -113,7 +113,7 @@ export const DrawRanges = () => {
         </>
       ) : (
         <>
-          <RangeGrid grid={grid} setGrid={setGrid} />
+          <RangeGrid grid={grid} setGrid={setGrid} drawable />
           <Button onClick={onSubmit} variant="outline">
             Submit
           </Button>
