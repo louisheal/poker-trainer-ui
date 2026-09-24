@@ -26,7 +26,7 @@ export const AppSidebar = () => {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  isActive={pathname === "/ranges" || pathname === "/"}
+                  isActive={pathname === "/ranges"}
                   onClick={() => navigate({ to: "/ranges" })}
                 >
                   <Grid2X2Check />
