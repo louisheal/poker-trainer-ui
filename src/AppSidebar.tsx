@@ -10,13 +10,16 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { Dices, Grid2X2Check } from "lucide-react";
 
 export const AppSidebar = () => {
   const matchRoute = useMatchRoute();
+  const { setOpenMobile } = useSidebar();
   const isRangesActive = Boolean(matchRoute({ to: "/ranges", fuzzy: true }));
   const isPreflopActive = Boolean(matchRoute({ to: "/preflop", fuzzy: true }));
+  const closeMobileSidebar = () => setOpenMobile(false);
 
   return (
     <Sidebar collapsible="icon">
@@ -29,6 +32,8 @@ export const AppSidebar = () => {
                 <SidebarMenuButton
                   render={<Link to="/ranges" />}
                   isActive={isRangesActive}
+                  size="lg"
+                  onClick={closeMobileSidebar}
                 >
                   <Grid2X2Check />
                   <span>Draw Ranges</span>
@@ -38,6 +43,8 @@ export const AppSidebar = () => {
                 <SidebarMenuButton
                   render={<Link to="/preflop" />}
                   isActive={isPreflopActive}
+                  size="lg"
+                  onClick={closeMobileSidebar}
                 >
                   <Dices />
                   <span>Preflop Trainer</span>
@@ -49,7 +56,7 @@ export const AppSidebar = () => {
       </SidebarContent>
       <SidebarFooter>
         <div className="relative w-full">
-          <SidebarTrigger className="absolute right-0.5 bottom-0.5" />
+          <SidebarTrigger className="absolute right-0.5 bottom-0.5 hidden md:inline-flex" />
         </div>
       </SidebarFooter>
     </Sidebar>
