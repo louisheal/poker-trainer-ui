@@ -4,7 +4,11 @@ import {
   getNextPosition,
   toSpotKey,
 } from "@/drawRanges/actionSequence/spotSequence";
-import { getRange, RangeNotFoundError, updateRange } from "@/drawRanges/api";
+import {
+  getAdminRange,
+  RangeNotFoundError,
+  updateAdminRange,
+} from "@/drawRanges/adminApi";
 import {
   type PokerAction,
   type PokerPosition,
@@ -26,7 +30,7 @@ export const AdminView = () => {
     const loadRange = async () => {
       const spotKey = toSpotKey(sequence);
       try {
-        const range = await getRange(spotKey);
+        const range = await getAdminRange(spotKey);
         if (isCurrentSpot) {
           setRange(range);
         }
@@ -52,7 +56,7 @@ export const AdminView = () => {
     }
 
     const spotKey = toSpotKey(sequence);
-    const newRange = await updateRange(spotKey, range);
+    const newRange = await updateAdminRange(spotKey, range);
     setRange(newRange);
   };
 
@@ -89,8 +93,6 @@ export const AdminView = () => {
   if (range === undefined) {
     return;
   }
-
-  console.log(sequence);
 
   return (
     <div className="flex flex-col justify-center items-center gap-4 p-8">
