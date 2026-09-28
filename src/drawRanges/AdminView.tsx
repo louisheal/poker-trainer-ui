@@ -1,82 +1,63 @@
 import { Button } from "@/components/ui/button";
 import { ActionSequence } from "@/drawRanges/actionSequence/ActionSequence";
-import { getRange, updateRange } from "@/drawRanges/api";
+import {
+  getNextPosition,
+  toSpotKey,
+} from "@/drawRanges/actionSequence/spotSequence";
+import { getRange, RangeNotFoundError, updateRange } from "@/drawRanges/api";
 import {
   type PokerAction,
   type PokerPosition,
   type PokerRange,
-  type RangeCell,
   type SequenceAction,
 } from "@/drawRanges/model";
+import { createFoldGrid } from "@/drawRanges/rangeGrid/handGrid";
 import { RangeGrid } from "@/drawRanges/rangeGrid/RangeGrid";
 import { useEffect, useState } from "react";
 
-// TODO : this is duplicated code, move it to somewhere more sensible
-const PokerPositions: PokerPosition[] = [
-  "Lojack",
-  "Hijack",
-  "Cutoff",
-  "Button",
-  "Small Blind",
-  "Big Blind",
-];
-
-// TODO : this is duplicated code, move it to somewhere more sensible
-const cards = ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"];
-
-const getHandKey = (i: number, j: number) => {
-  const cardA = cards[i];
-  const cardB = cards[j];
-  if (i < j) {
-    return `${cardA}${cardB}s`;
-  }
-  if (i > j) {
-    return `${cardB}${cardA}o`;
-  }
-  return `${cardA}${cardB}`;
-};
-
-const initialiseGrid = (): PokerRange => {
-  const grid: RangeCell[][] = [];
-  for (let i = 0; i < 13; i++) {
-    const row: RangeCell[] = [];
-    for (let j = 0; j < 13; j++) {
-      row.push({ HandKey: getHandKey(i, j), Action: "Fold" });
-    }
-    grid.push(row);
-  }
-  return grid;
-};
-
-const toSpotKey = (sequence: SequenceAction[]): string => {
-  const result: string[] = ["X"];
-  sequence.forEach((action) =>
-    result.push(`${action.Position}_${action.Action}`),
-  );
-  return result.join("_");
-};
-
 export const AdminView = () => {
   const [sequence, setSequence] = useState<SequenceAction[]>([]);
-  const [range, setRange] = useState<PokerRange>(() => initialiseGrid());
-  const nextPosition = PokerPositions[sequence.length];
+  const [range, setRange] = useState<PokerRange>();
+  const nextPosition = getNextPosition(sequence.length);
 
   useEffect(() => {
+    let isCurrentSpot = true;
+
     const loadRange = async () => {
       const spotKey = toSpotKey(sequence);
-      const range = await getRange(spotKey);
-      setRange(range);
+      try {
+        const range = await getRange(spotKey);
+        if (isCurrentSpot) {
+          setRange(range);
+        }
+      } catch (error) {
+        if (!isCurrentSpot) {
+          return;
+        }
+        setRange(
+          error instanceof RangeNotFoundError ? createFoldGrid() : undefined,
+        );
+      }
     };
-    loadRange();
+
+    void loadRange();
+    return () => {
+      isCurrentSpot = false;
+    };
   }, [sequence]);
 
   const onSubmit = async () => {
+    if (range === undefined) {
+      return;
+    }
+
     const spotKey = toSpotKey(sequence);
     const newRange = await updateRange(spotKey, range);
     setRange(newRange);
   };
 
   const onSequenceUpdate = (position: PokerPosition, action: PokerAction) => {
+    setRange(undefined);
     setSequence((prev) => {
       const next: SequenceAction[] = [];
 
@@ -94,6 +75,17 @@ export const AdminView = () => {
     });
   };
 
+  const setLoadedRange = (
+    next: PokerRange | ((previous: PokerRange) => PokerRange),
+  ) => {
+    setRange((previous) => {
+      if (previous === undefined) {
+        return previous;
+      }
+      return typeof next === "function" ? next(previous) : next;
+    });
+  };
+
   if (range === undefined) {
     return;
   }
@@ -103,7 +95,7 @@ export const AdminView = () => {
   return (
     <div className="flex flex-col justify-center items-center gap-4 p-8">
       <ActionSequence sequence={sequence} onUpdate={onSequenceUpdate} />
-      <RangeGrid grid={range} setGrid={setRange} drawable />
+      <RangeGrid grid={range} setGrid={setLoadedRange} drawable />
       <Button onClick={onSubmit} variant="outline">
         Submit
       </Button>

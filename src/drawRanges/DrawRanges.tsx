@@ -1,72 +1,27 @@
 import { Button } from "@/components/ui/button";
 import { ActionSequence } from "@/drawRanges/actionSequence/ActionSequence";
-import { getRange } from "@/drawRanges/api";
 import {
-  type PokerPosition,
-  type PokerRange,
-  type RangeCell,
-  type SequenceAction,
-} from "@/drawRanges/model";
+  createRfiSequence,
+  RFI_POSITIONS,
+  toSpotKey,
+} from "@/drawRanges/actionSequence/spotSequence";
+import { getRange } from "@/drawRanges/api";
+import type { PokerRange, SequenceAction } from "@/drawRanges/model";
+import { createFoldGrid } from "@/drawRanges/rangeGrid/handGrid";
 import { RangeGrid } from "@/drawRanges/rangeGrid/RangeGrid";
+import { LoaderCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 
-const PokerPositions: PokerPosition[] = [
-  "Lojack",
-  "Hijack",
-  "Cutoff",
-  "Button",
-  "Small Blind",
-  "Big Blind",
-];
-
-// TODO : this is duplicated code, move it to somewhere more sensible
-const cards = ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"];
-
-const getHandKey = (i: number, j: number) => {
-  const cardA = cards[i];
-  const cardB = cards[j];
-  if (i < j) {
-    return `${cardA}${cardB}s`;
-  }
-  if (i > j) {
-    return `${cardB}${cardA}o`;
-  }
-  return `${cardA}${cardB}`;
-};
-
-const initialiseGrid = () => {
-  const grid: RangeCell[][] = [];
-  for (let i = 0; i < 13; i++) {
-    const row: RangeCell[] = [];
-    for (let j = 0; j < 13; j++) {
-      row.push({ HandKey: getHandKey(i, j), Action: "Fold" });
-    }
-    grid.push(row);
-  }
-  return grid;
-};
-
-const toSpotKey = (sequence: SequenceAction[]): string => {
-  const result: string[] = ["X"];
-  sequence.forEach((action) =>
-    result.push(`${action.Position}_${action.Action}`),
-  );
-  return result.join("_");
-};
-
 const generateSequence = () => {
-  const position = Math.floor(Math.random() * 4);
-  const result: SequenceAction[] = [];
-  for (let i = 0; i < position; i++) {
-    result.push({ Position: PokerPositions[i], Action: "Fold" });
-  }
-  return result;
+  const position =
+    RFI_POSITIONS[Math.floor(Math.random() * RFI_POSITIONS.length)];
+  return createRfiSequence(position);
 };
 
 export const DrawRanges = () => {
   const [sequence, setSequence] = useState<SequenceAction[]>([]);
   const [range, setRange] = useState<PokerRange>();
-  const [grid, setGrid] = useState(() => initialiseGrid());
+  const [grid, setGrid] = useState(() => createFoldGrid());
   const [submitted, setSubmitted] = useState(false);
 
   const loadSpot = async () => {
@@ -85,7 +40,7 @@ export const DrawRanges = () => {
   const onNext = () => {
     setRange(undefined);
     setSubmitted(false);
-    setGrid(initialiseGrid());
+    setGrid(createFoldGrid());
     loadSpot();
   };
 
@@ -93,9 +48,19 @@ export const DrawRanges = () => {
     loadSpot();
   }, []);
 
-  // TODO : add loading spinner
   if (range === undefined) {
-    return;
+    return (
+      <div
+        className="flex min-h-[50vh] w-full items-center justify-center"
+        role="status"
+        aria-label="Loading range"
+      >
+        <LoaderCircle
+          className="size-8 animate-spin text-muted-foreground"
+          aria-hidden="true"
+        />
+      </div>
+    );
   }
 
   return (

@@ -4,6 +4,7 @@ import type {
   PokerPosition,
   SequenceAction,
 } from "@/drawRanges/model";
+import { getNextPosition } from "@/drawRanges/actionSequence/spotSequence";
 import { ChevronRight } from "lucide-react";
 
 interface Props {
@@ -11,24 +12,18 @@ interface Props {
   onUpdate?: (position: PokerPosition, action: PokerAction) => void;
 }
 
-const PokerPositions: PokerPosition[] = [
-  "Lojack",
-  "Hijack",
-  "Cutoff",
-  "Button",
-  "Small Blind",
-  "Big Blind",
-];
-
 // TODO : add id to sequence actions
 export const ActionSequence = ({ sequence, onUpdate = () => {} }: Props) => {
-  const nextPosition = PokerPositions[sequence.length];
+  const nextPosition = getNextPosition(sequence.length);
 
   return (
     <div className="w-full overflow-x-auto">
       <div className="flex w-fit min-w-full items-center gap-2 pb-1 sm:gap-3">
         {sequence.map((sequenceAction) => (
-          <div className="flex items-center gap-2 sm:gap-3" key={sequenceAction.Position}>
+          <div
+            className="flex items-center gap-2 sm:gap-3"
+            key={sequenceAction.Position}
+          >
             <ActionPanel
               sequenceAction={sequenceAction}
               onUpdate={(action: PokerAction) =>

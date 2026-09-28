@@ -1,12 +1,19 @@
 import type { ActionDto, PokerRangeDto } from "@/drawRanges/dto";
 import type { PokerAction, PokerRange, RangeCell } from "@/drawRanges/model";
+import { getHandKeysByRow } from "@/drawRanges/rangeGrid/handGrid";
 
 const URL = import.meta.env.VITE_API_URL ?? "";
+
+export class RangeNotFoundError extends Error {}
 
 export const getRange = async (spotKey: string): Promise<PokerRange> => {
   const response = await fetch(
     `${URL}/api/DrawRanges/range?spotKey=${spotKey}`,
   );
+
+  if (response.status === 404) {
+    throw new RangeNotFoundError(`No range found for spot: ${spotKey}`);
+  }
 
   if (!response.ok) {
     throw new Error(`Response status: ${response.status}`);
@@ -46,8 +53,7 @@ export const updateRange = async (
 };
 
 const mapRange = (rangeDto: Record<string, ActionDto>): RangeCell[][] => {
-  const handKeys = generateHandKeys();
-  return handKeys.map((row) =>
+  return getHandKeysByRow().map((row) =>
     row.map((key) => ({ HandKey: key, Action: mapAction(rangeDto[key]) })),
   );
 };
@@ -59,30 +65,4 @@ const mapAction = (actionDto: ActionDto): PokerAction => {
     case "raise":
       return "Raise";
   }
-};
-
-const cards = ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"];
-
-const getHandKey = (i: number, j: number) => {
-  const cardA = cards[i];
-  const cardB = cards[j];
-  if (i < j) {
-    return `${cardA}${cardB}s`;
-  }
-  if (i > j) {
-    return `${cardB}${cardA}o`;
-  }
-  return `${cardA}${cardB}`;
-};
-
-const generateHandKeys = () => {
-  const result = [];
-  for (let i = 0; i < 13; i++) {
-    const row = [];
-    for (let j = 0; j < 13; j++) {
-      row.push(getHandKey(i, j));
-    }
-    result.push(row);
-  }
-  return result;
 };
