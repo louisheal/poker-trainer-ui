@@ -6,7 +6,6 @@ import {
   checkAdminSession,
   InvalidAdminPasswordError,
   loginAdmin,
-  logoutAdmin,
 } from "@/drawRanges/adminApi";
 import { LoaderCircle } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -71,18 +70,6 @@ export const AdminGate = () => {
     }
   };
 
-  const onLogout = async () => {
-    setBusy(true);
-    try {
-      await logoutAdmin();
-      setAuthState("signed-out");
-    } catch {
-      setError("Could not sign out. Please try again.");
-    } finally {
-      setBusy(false);
-    }
-  };
-
   if (authState === "checking") {
     return (
       <div
@@ -133,19 +120,5 @@ export const AdminGate = () => {
     );
   }
 
-  return (
-    <>
-      <div className="flex justify-end px-4 pt-3">
-        {error && (
-          <p className="mr-3 self-center text-sm text-destructive" role="alert">
-            {error}
-          </p>
-        )}
-        <Button variant="outline" disabled={busy} onClick={onLogout}>
-          Sign out
-        </Button>
-      </div>
-      <AdminView />
-    </>
-  );
+  return <AdminView />;
 };

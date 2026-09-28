@@ -49,16 +49,6 @@ export const loginAdmin = async (password: string): Promise<void> => {
   }
 };
 
-export const logoutAdmin = async (): Promise<void> => {
-  const response = await fetch(`${URL}/api/admin/auth/logout`, {
-    method: "POST",
-    credentials: "include",
-  });
-  if (!response.ok) {
-    throw new Error(`Response status: ${response.status}`);
-  }
-};
-
 export const getAdminRange = async (spotKey: string): Promise<PokerRange> => {
   const response = await fetch(
     `${URL}/api/admin/ranges/range?spotKey=${encodeURIComponent(spotKey)}`,
