@@ -17,6 +17,7 @@ import {
 } from "@/drawRanges/model";
 import { createFoldGrid } from "@/drawRanges/rangeGrid/handGrid";
 import { RangeGrid } from "@/drawRanges/rangeGrid/RangeGrid";
+import { LoaderCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export const AdminView = () => {
@@ -90,17 +91,28 @@ export const AdminView = () => {
     });
   };
 
-  if (range === undefined) {
-    return;
-  }
-
   return (
     <div className="flex flex-col justify-center items-center gap-4 p-8">
       <ActionSequence sequence={sequence} onUpdate={onSequenceUpdate} />
-      <RangeGrid grid={range} setGrid={setLoadedRange} drawable />
-      <Button onClick={onSubmit} variant="outline">
-        Submit
-      </Button>
+      {range === undefined ? (
+        <div
+          className="flex aspect-square w-full max-w-[42rem] items-center justify-center"
+          role="status"
+          aria-label="Loading range"
+        >
+          <LoaderCircle
+            className="size-8 animate-spin text-muted-foreground"
+            aria-hidden="true"
+          />
+        </div>
+      ) : (
+        <>
+          <RangeGrid grid={range} setGrid={setLoadedRange} drawable />
+          <Button onClick={onSubmit} variant="outline">
+            Submit
+          </Button>
+        </>
+      )}
     </div>
   );
 };
