@@ -1,6 +1,6 @@
-export type Action = "Raise" | "Fold";
+export type PokerAction = "Raise" | "Fold";
 
-export type Position =
+export type PokerPosition =
   | "Lojack"
   | "Hijack"
   | "Cutoff"
@@ -10,15 +10,17 @@ export type Position =
 
 export interface RangeCell {
   HandKey: string;
-  Action: Action;
+  Action: PokerAction;
 }
 
 export interface SequenceAction {
-  Position: Position;
-  Action: Action;
+  Position: PokerPosition;
+  Action: PokerAction;
 }
 
 export interface RangeSpot {
   Sequence: SequenceAction[];
   Range: RangeCell[][];
 }
+
+export type PokerRange = RangeCell[][];

@@ -1,45 +1,36 @@
 import { Button } from "@/components/ui/button";
 import { ActionSequence } from "@/drawRanges/actionSequence/ActionSequence";
-import { getSpot } from "@/drawRanges/api";
-import type { RangeCell, RangeSpot } from "@/drawRanges/model";
+import {
+  createRfiSequence,
+  RFI_POSITIONS,
+  toSpotKey,
+} from "@/drawRanges/actionSequence/spotSequence";
+import { getRange } from "@/drawRanges/api";
+import type { PokerRange, SequenceAction } from "@/drawRanges/model";
+import { createFoldGrid } from "@/drawRanges/rangeGrid/handGrid";
 import { RangeGrid } from "@/drawRanges/rangeGrid/RangeGrid";
+import { LoaderCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 
-// TODO : this is duplicated code, move it to somewhere more sensible
-const cards = ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"];
-
-const getHandKey = (i: number, j: number) => {
-  const cardA = cards[i];
-  const cardB = cards[j];
-  if (i < j) {
-    return `${cardA}${cardB}s`;
-  }
-  if (i > j) {
-    return `${cardB}${cardA}o`;
-  }
-  return `${cardA}${cardB}`;
-};
-
-const initialiseGrid = () => {
-  const grid: RangeCell[][] = [];
-  for (let i = 0; i < 13; i++) {
-    const row: RangeCell[] = [];
-    for (let j = 0; j < 13; j++) {
-      row.push({ HandKey: getHandKey(i, j), Action: "Fold" });
-    }
-    grid.push(row);
-  }
-  return grid;
+const generateSequence = () => {
+  const position =
+    RFI_POSITIONS[Math.floor(Math.random() * RFI_POSITIONS.length)];
+  return createRfiSequence(position);
 };
 
 export const DrawRanges = () => {
-  const [spot, setSpot] = useState<RangeSpot>();
-  const [grid, setGrid] = useState(() => initialiseGrid());
+  const [sequence, setSequence] = useState<SequenceAction[]>([]);
+  const [range, setRange] = useState<PokerRange>();
+  const [grid, setGrid] = useState(() => createFoldGrid());
   const [submitted, setSubmitted] = useState(false);
 
   const loadSpot = async () => {
-    const spot = await getSpot();
-    setSpot(spot);
+    const sequence: SequenceAction[] = generateSequence();
+    setSequence(sequence);
+
+    const spotKey = toSpotKey(sequence);
+    const range = await getRange(spotKey);
+    setRange(range);
   };
 
   const onSubmit = () => {
@@ -47,9 +38,9 @@ export const DrawRanges = () => {
   };
 
   const onNext = () => {
-    setSpot(undefined);
+    setRange(undefined);
     setSubmitted(false);
-    setGrid(initialiseGrid());
+    setGrid(createFoldGrid());
     loadSpot();
   };
 
@@ -57,19 +48,29 @@ export const DrawRanges = () => {
     loadSpot();
   }, []);
 
-  // TODO : add loading spinner
-  if (spot === undefined) {
-    return;
+  if (range === undefined) {
+    return (
+      <div
+        className="flex min-h-[50vh] w-full items-center justify-center"
+        role="status"
+        aria-label="Loading range"
+      >
+        <LoaderCircle
+          className="size-8 animate-spin text-muted-foreground"
+          aria-hidden="true"
+        />
+      </div>
+    );
   }
 
   return (
-    <div className="flex flex-col justify-center items-center gap-4 p-8">
-      <ActionSequence sequence={spot.Sequence} />
+    <div className="flex w-full flex-col items-center justify-center gap-3 px-0 py-3 sm:gap-4 sm:px-4 sm:py-4 md:px-8 md:py-8">
+      <ActionSequence sequence={sequence} />
       {submitted ? (
         <>
-          <div className="flex gap-4">
-            <RangeGrid grid={grid} setGrid={() => {}} size="small" />
-            <RangeGrid grid={spot.Range} setGrid={() => {}} size="small" />
+          <div className="flex w-full flex-col items-center gap-3 sm:gap-4 lg:flex-row lg:justify-center">
+            <RangeGrid grid={grid} size="small" />
+            <RangeGrid grid={range} size="small" />
           </div>
           <Button onClick={onNext} variant="outline">
             Next
@@ -77,7 +78,7 @@ export const DrawRanges = () => {
         </>
       ) : (
         <>
-          <RangeGrid grid={grid} setGrid={setGrid} />
+          <RangeGrid grid={grid} setGrid={setGrid} drawable />
           <Button onClick={onSubmit} variant="outline">
             Submit
           </Button>
