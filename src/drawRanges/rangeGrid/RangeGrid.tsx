@@ -48,7 +48,6 @@ export const RangeGrid = (props: Props) => {
     targetActionRef.current = targetAction;
     pointerDownRef.current = true;
     activePointerIdRef.current = event.pointerId;
-    event.currentTarget.setPointerCapture(event.pointerId);
     event.preventDefault();
     toggleCell(row, col);
   };
@@ -180,12 +179,11 @@ interface GridCellProps {
 
 const GridCell = (props: GridCellProps) => {
   const colour = props.action === "Fold" ? "bg-blue-400" : "bg-red-500";
-  const hoverColour =
-    props.drawable
-      ? props.action === "Fold"
-        ? "hover:bg-blue-300"
-        : "hover:bg-red-400"
-      : "";
+  const hoverColour = props.drawable
+    ? props.action === "Fold"
+      ? "hover:bg-blue-300"
+      : "hover:bg-red-400"
+    : "";
   const rounding = getRounding(props.row, props.col);
 
   const dimensions =
@@ -200,11 +198,14 @@ const GridCell = (props: GridCellProps) => {
       data-col={props.col}
       className={`${colour} rounded-none ${rounding} ${dimensions} ${hoverColour} ${props.drawable ? "touch-none select-none" : "touch-auto"} items-center justify-center p-0 text-center leading-none`}
       onPointerEnter={
-        props.drawable ? () => props.onPointerEnter(props.row, props.col) : undefined
+        props.drawable
+          ? () => props.onPointerEnter(props.row, props.col)
+          : undefined
       }
       onPointerDown={
         props.drawable
-          ? (event) => props.onPointerDown(event, props.action, props.row, props.col)
+          ? (event) =>
+              props.onPointerDown(event, props.action, props.row, props.col)
           : undefined
       }
       onDragStart={(e) => e.preventDefault()}

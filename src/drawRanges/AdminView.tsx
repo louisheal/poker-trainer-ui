@@ -103,7 +103,7 @@ export const AdminView = () => {
   return (
     <div className="flex flex-col justify-center items-center gap-4 p-8">
       <ActionSequence sequence={sequence} onUpdate={onSequenceUpdate} />
-      <RangeGrid grid={range} setGrid={setRange} />
+      <RangeGrid grid={range} setGrid={setRange} drawable />
       <Button onClick={onSubmit} variant="outline">
         Submit
       </Button>
