@@ -4,8 +4,6 @@ import type { PokerRange } from "@/drawRanges/model";
 
 export { RangeNotFoundError };
 
-const URL = import.meta.env.VITE_API_URL ?? "";
-
 export class InvalidAdminPasswordError extends Error {}
 export class AdminSessionExpiredError extends Error {}
 
@@ -20,7 +18,7 @@ const throwIfUnauthorized = (response: Response) => {
 };
 
 export const checkAdminSession = async (): Promise<boolean> => {
-  const response = await fetch(`${URL}/api/admin/auth/session`, {
+  const response = await fetch(`/api/admin/auth/session`, {
     credentials: "include",
   });
 
@@ -34,7 +32,7 @@ export const checkAdminSession = async (): Promise<boolean> => {
 };
 
 export const loginAdmin = async (password: string): Promise<void> => {
-  const response = await fetch(`${URL}/api/admin/auth/login`, {
+  const response = await fetch(`/api/admin/auth/login`, {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -51,7 +49,7 @@ export const loginAdmin = async (password: string): Promise<void> => {
 
 export const getAdminRange = async (spotKey: string): Promise<PokerRange> => {
   const response = await fetch(
-    `${URL}/api/admin/ranges/range?spotKey=${encodeURIComponent(spotKey)}`,
+    `/api/admin/ranges/range?spotKey=${encodeURIComponent(spotKey)}`,
     { credentials: "include" },
   );
 
@@ -72,7 +70,7 @@ export const updateAdminRange = async (
   range: PokerRange,
 ): Promise<PokerRange> => {
   const response = await fetch(
-    `${URL}/api/admin/ranges/range?spotKey=${encodeURIComponent(spotKey)}`,
+    `/api/admin/ranges/range?spotKey=${encodeURIComponent(spotKey)}`,
     {
       method: "POST",
       credentials: "include",

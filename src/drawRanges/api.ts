@@ -2,14 +2,10 @@ import type { ActionDto, PokerRangeDto } from "@/drawRanges/dto";
 import type { PokerAction, PokerRange, RangeCell } from "@/drawRanges/model";
 import { getHandKeysByRow } from "@/drawRanges/rangeGrid/handGrid";
 
-const URL = import.meta.env.VITE_API_URL ?? "";
-
 export class RangeNotFoundError extends Error {}
 
 export const getRange = async (spotKey: string): Promise<PokerRange> => {
-  const response = await fetch(
-    `${URL}/api/DrawRanges/range?spotKey=${spotKey}`,
-  );
+  const response = await fetch(`/api/DrawRanges/range?spotKey=${spotKey}`);
 
   if (response.status === 404) {
     throw new RangeNotFoundError(`No range found for spot: ${spotKey}`);
@@ -42,6 +38,8 @@ const mapAction = (actionDto: ActionDto): PokerAction => {
   switch (actionDto) {
     case "fold":
       return "Fold";
+    case "call":
+      return "Call";
     case "raise":
       return "Raise";
   }

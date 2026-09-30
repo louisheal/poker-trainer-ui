@@ -17,11 +17,11 @@ export const ActionSequence = ({ sequence, onUpdate = () => {} }: Props) => {
   const nextPosition = getNextPosition(sequence.length);
 
   return (
-    <div className="w-full overflow-x-auto">
-      <div className="flex w-fit min-w-full items-center gap-2 pb-1 sm:gap-3">
+    <div className="mx-2 w-[calc(100%-1rem)] max-w-2xl overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:w-full">
+      <div className="flex w-max min-w-full items-center justify-center gap-0.5 py-1 sm:gap-1">
         {sequence.map((sequenceAction) => (
           <div
-            className="flex items-center gap-2 sm:gap-3"
+            className="flex items-center gap-0.5 sm:gap-1"
             key={sequenceAction.Position}
           >
             <ActionPanel
@@ -30,7 +30,7 @@ export const ActionSequence = ({ sequence, onUpdate = () => {} }: Props) => {
                 onUpdate(sequenceAction.Position, action)
               }
             />
-            <ChevronRight className="shrink-0" />
+            <ChevronRight className="size-4 shrink-0" />
           </div>
         ))}
         {/* TODO : work out what the next position to act is */}

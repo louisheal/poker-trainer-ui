@@ -1,12 +1,7 @@
-export type PokerAction = "Raise" | "Fold";
+export type PokerAction = "Fold" | "Call" | "Raise";
 
 export type PokerPosition =
-  | "Lojack"
-  | "Hijack"
-  | "Cutoff"
-  | "Button"
-  | "Small Blind"
-  | "Big Blind";
+  "Lojack" | "Hijack" | "Cutoff" | "Button" | "Small Blind" | "Big Blind";
 
 export interface RangeCell {
   HandKey: string;

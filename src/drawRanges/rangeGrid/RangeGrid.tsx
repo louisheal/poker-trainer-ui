@@ -6,12 +6,13 @@ import type { PointerEvent } from "react";
 interface Props {
   grid: PokerRange;
   setGrid?: (prev: PokerRange | ((prev: PokerRange) => PokerRange)) => void;
-  drawable?: boolean;
+  paintAction?: PokerAction;
   size?: "default" | "small";
 }
 
 export const RangeGrid = (props: Props) => {
-  const isDrawable = props.drawable === true;
+  const isDrawable =
+    props.paintAction !== undefined && props.setGrid !== undefined;
   const pointerDownRef = useRef(false);
   const activePointerIdRef = useRef<number | null>(null);
   const targetActionRef = useRef<PokerAction>("Raise");
@@ -36,16 +37,14 @@ export const RangeGrid = (props: Props) => {
 
   const onPointerDown = (
     event: PointerEvent<HTMLDivElement>,
-    current: PokerAction,
     row: number,
     col: number,
   ) => {
-    if (!isDrawable) {
+    if (!isDrawable || props.paintAction === undefined) {
       return;
     }
 
-    const targetAction = current === "Fold" ? "Raise" : "Fold";
-    targetActionRef.current = targetAction;
+    targetActionRef.current = props.paintAction;
     pointerDownRef.current = true;
     activePointerIdRef.current = event.pointerId;
     event.preventDefault();
@@ -113,7 +112,7 @@ export const RangeGrid = (props: Props) => {
   };
 
   const gridWidth =
-    props.size === "small" ? "max-w-[30rem] lg:max-w-[28rem]" : "max-w-[42rem]";
+    props.size === "small" ? "max-w-[30rem] lg:max-w-[36rem]" : "max-w-[42rem]";
 
   return (
     <div className={`w-full ${gridWidth}`}>
@@ -170,7 +169,6 @@ interface GridCellProps {
   onPointerEnter: (row: number, col: number) => void;
   onPointerDown: (
     event: PointerEvent<HTMLDivElement>,
-    current: PokerAction,
     row: number,
     col: number,
   ) => void;
@@ -178,12 +176,16 @@ interface GridCellProps {
 }
 
 const GridCell = (props: GridCellProps) => {
-  const colour = props.action === "Fold" ? "bg-blue-400" : "bg-red-500";
-  const hoverColour = props.drawable
-    ? props.action === "Fold"
-      ? "hover:bg-blue-300"
-      : "hover:bg-red-400"
-    : "";
+  const colour = {
+    Fold: "bg-blue-400",
+    Call: "bg-green-500",
+    Raise: "bg-red-500",
+  }[props.action];
+  const hoverColour = {
+    Fold: "hover:bg-blue-300",
+    Call: "hover:bg-green-400",
+    Raise: "hover:bg-red-400",
+  }[props.action];
   const rounding = getRounding(props.row, props.col);
 
   const dimensions =
@@ -204,8 +206,7 @@ const GridCell = (props: GridCellProps) => {
       }
       onPointerDown={
         props.drawable
-          ? (event) =>
-              props.onPointerDown(event, props.action, props.row, props.col)
+          ? (event) => props.onPointerDown(event, props.row, props.col)
           : undefined
       }
       onDragStart={(e) => e.preventDefault()}

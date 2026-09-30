@@ -1,4 +1,4 @@
-export type ActionDto = "raise" | "fold";
+export type ActionDto = "raise" | "call" | "fold";
 
 export type PositionDto = "lj" | "hj" | "co" | "btn" | "sb" | "bb";
 

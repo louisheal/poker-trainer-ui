@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ActionSequence } from "@/drawRanges/actionSequence/ActionSequence";
 import {
+  getRangeActionsForSpot,
   getNextPosition,
   toSpotKey,
 } from "@/drawRanges/actionSequence/spotSequence";
@@ -16,8 +17,7 @@ import {
   type SequenceAction,
 } from "@/drawRanges/model";
 import { createFoldGrid } from "@/drawRanges/rangeGrid/handGrid";
-import { RangeGrid } from "@/drawRanges/rangeGrid/RangeGrid";
-import { LoaderCircle } from "lucide-react";
+import { RangeEditor } from "@/drawRanges/rangeGrid/RangeEditor";
 import { useEffect, useState } from "react";
 
 export const AdminView = () => {
@@ -92,22 +92,16 @@ export const AdminView = () => {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center gap-4 p-8">
+    <div className="flex w-full flex-col items-center justify-center gap-3 px-0 py-3 sm:gap-4 sm:px-4 sm:py-4 md:px-8 md:py-8">
       <ActionSequence sequence={sequence} onUpdate={onSequenceUpdate} />
-      {range === undefined ? (
-        <div
-          className="flex aspect-square w-full max-w-[42rem] items-center justify-center"
-          role="status"
-          aria-label="Loading range"
-        >
-          <LoaderCircle
-            className="size-8 animate-spin text-muted-foreground"
-            aria-hidden="true"
-          />
-        </div>
-      ) : (
+      <RangeEditor
+        grid={range ?? createFoldGrid()}
+        setGrid={setLoadedRange}
+        availableActions={getRangeActionsForSpot(sequence)}
+        loading={range === undefined}
+      />
+      {range !== undefined && (
         <>
-          <RangeGrid grid={range} setGrid={setLoadedRange} drawable />
           <Button onClick={onSubmit} variant="outline">
             Submit
           </Button>
